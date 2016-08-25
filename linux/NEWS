@@ -1,0 +1,11 @@
+October 30, 2008: 
+	The new version 0.0.2 with minor changes due to porting the program 
+	to M$ Windows using GTK package. The behaviour of the program is not 
+	perfect under Windows, but at least works :).
+
+September 25, 2008:
+
+This is the first workable version of the programs
+	bill
+	calc
+

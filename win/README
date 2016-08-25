@@ -1,0 +1,202 @@
+Martin Horvat, PhD in theoretical Physics
+
+email:martin.horvat@fmf.uni-lj.si
+web: http://chaos.fmf.uni-lj.si/horvat
+skype:mukitheman
+
+Department of physics
+Faculty of mathematics and physics
+University of Ljubjana
+Slovenia
+
+** Introduction **
+
+Dynamics in a billiard with inner and outer boundary parallel to each other. In such a billiard the dynamics is unidirectional. The inner boundary is defined in Cartesian coordinates as
+
+  r(phi) (cos(phi), sin(phi))
+
+and the outer boundary is given as
+
+  r(phi) (cos(phi), sin(phi)) + d n(phi)
+
+where d is the width of the billiard and n(phi) is the normal vector to the boundaries at the angle phi. 
+
+  n(phi) = (r'(phi)sin(phi) + r(phi)cos(phi), -r'(phi)cos(phi)+r(phi)sin(phi))/
+   (r'(phi)^2+r^2(phi))^(1/2)
+
+Here we define the r(phi) via trigonometrical series
+
+  r(phi) = a_0 + sum_{n=1}^infinity a_n cos(n phi) + b_n sin(n phi)
+
+This series can be more sophistically written as
+
+  r(phi) = sum_{s in {0,1}} sum_{n=0}^infinity c_{s,n} f(s,n phi) 
+
+with f(0,x) = sin(x) and f(1,x)=cos(x);
+
+The present "software package" brings two programs
+
+  bill
+  calc
+
+The last "calc" is command line program with inputs via command line and standard input (stdin), and the first "bill" (short for billiard) is basically the second program "calc" with GUI (Graphical User Inferface). The latter need the file "bill.glade" which contains the information about the GUI in an XML form. The programs "calc" and "bill" was written and may be distribute under GNU Lesser General Public License (LGPL) version 3 and testing was performed on ubuntu 8.10 (linux OS). Note that the random generator "Mersenne Twister" in MersenneTwister.h is redistributed under BSD license.
+
+
+** Compilation and installation **
+Under LINUX: use the archive bill.0.0.2.tar.gz
+
+The program "bill" depends especially on libraries
+  glade
+  gthread
+  cairo
+  gtk
+so you need to have them on the computer in order to compile the program.
+
+To build the program do
+
+  ./configure
+  make
+
+and to install copy 
+
+  bill calc bill.glade
+  
+in the same directory. The bill and calc program work with a configuration files containing the width "d" and formula "r(phi)" by coefficients. The format of the file is
+
+Under Windows: the binaries
+
+Download bill_win32_0.0.2.tar.gz and extract everything somewhere. Install the GTK package for Win32 (gtk-2.12.9-win32-2.exe) and run the program (./bill) in the directory "./prog". The program depends on the .dll files in "./prog" directory as also on .dll files provided by the GTK package. 
+
+The source files are in directory ./source. To compile them install 
+
+  GTK (I've used gtk-2.12.9-win32-2.exe)
+  GTK-devel for Win32 (I've used gtk-dev-2.12.9-win32-2.exe) 
+  PTHREADS for Win32  (I've used  pthreads-w32-2-8-0-release.exe)
+
+everything in same directory and use C++ compiler (I've used DEV++ devcpp-4.9.9.2_setup.exe) everything in the similar fashion as is does the batch script "compile.bat"
+
+---(start:.cfg)
+
+<d>
+
+<s_1> <n_1> <c_{s_1,n_1}>
+...
+<s_m> <n_m> <c_{s_m,n_m}>
+...
+
+---(end:.cfg)
+
+
+For example look at the file "test.cfg"
+
+---(start: test.cfg )
+0.5
+0 0 1
+0 1 0.3
+1 1 0.6
+--(end: test.cfg )
+
+defining the billiard of the width d=0.5 and the radius function
+
+  r(phi) = 1 + 0.3*sin(phi) + 0.6*cos(phi).
+  
+More detailed description how to use both program will be eventually added or contact me via email or skype and I will gladly help.
+
+** Quick tutorial **
+
+I) How to use "calc" program works purely in the command line using stdin and stdout. All the possibilities how to use it can be seen by executing 
+
+  ./calc
+
+which plots
+
+
+calc s <m> < <cfg> # plotting shape
+     p <m> < <cfg> # plotting path
+     S <phi:l> <px:py> <t> # plotting the trajectory
+     P <phi:sign> <N:seed> <n> # Poincare portraits
+note:
+  m - number of points per a plotted curve
+  phi:l - initial point on a cross-section
+  px:py - initial moment of the particle
+  t - length of trajectory in time
+  N:seed - number of samples points, seed for the random generator
+  n - length of trajectory in number of iterations
+  phi:sign - cross-ection and direction of travel
+
+
+Image you have the configuration of the billiard stored in "test.cfg".
+
+
+A) Then you can get the shape of the billiard (meaning the inner and outer boundary) by doing:
+
+  ./calc s 100 < test.cfg > shape.dat
+
+where we represent the line with 100 points. The "shape.dat" is a text file with two columns interrupted by a blank line separating data corresponding to the inner and outer boundary:
+
+--(start:shape.dat)
+  x_{inner,00} y_{inner.00}
+  x_{inner,01} y_{inner.01}
+  ....
+  x_{inner,99} y_{inner.99}
+  (blank line)
+  x_{outer,00} y_{outer.00}
+  x_{outer,01} y_{outer.01}
+  ....
+  x_{outer,99} y_{outer.99}
+--(end:shape.dat)
+
+You can visualize the shape of the billiard simply using "gnuplot" program writting
+
+gnuplot> plot 'shape.dat' w l
+
+B) Similarly we can get the integral of 
+
+  s(phi) = int_0^phi sqrt{r(x)^2 + r'(x)^2} dx
+
+computed in m point by executing
+
+  ./calc p 100 < test.cfg > path.dat
+
+and the file "path.dat" has to columns <phi_i> and <s(phi_i)>.
+
+C) The individual trajectories inside the billiard that start on some cross-section can be also calculated. Assuming, we take a cross-section (CS) at the angle "phi" and let the trajectory start on distance "l" from the inner border on CS with the speed vector (px,py). Then we obtain the trajectory by writing
+
+  ./calc S phi:l px:py t  < test.cfg  > traj.dat
+
+where t is the time up to which we calculate the trajectory. In the "traj.dat" file we find two columns <X_i> <Y_i> corresponding to particle collisions with the boundaries. It is convenient to visualize this via "gnuplot" as
+
+gnuplot> plot 'shape.dat' w l, 'traj.dat' w l
+
+
+D) We can also plot the phase-space portraits of the Poincare map from a cross-section (CS) at the angle "phi" [radians] to the same CS, because the dynamics is unidirectional.  The point on the phase-space corresponding to a CS is composed of the position "x" along the CS and projection of speed on the CS:
+
+  (x,v_x) in [0,d]x[-1,1]
+
+Here we assume the total speed of all particles in v_x^2 + v_y^2 =1! Lets just discuss "N" particles moving in the "sign" (in {-1,1}) direction w.r.t. to the angle variable that pass "n" times the starting CS. By just registering the points when the particles pass the CS we get the phase-space portrait that is calculated by
+
+ ./calc P phi:sign N:seed  n  < test.cfg  > poincare.dat
+  
+
+The "seed" is the seed of random generator of initial positions on CS.
+
+NOTE: The program is intended for academic use ONLY and the calculations are NOT BULLET-PROOF. Many possible numerical instabilities have been considered and therefore the calculations are not very fast.  Nevertheless some computational problems are currently not well solved and remain quite open. In the event that some calculation is not resolved correctly that program should return an error message to stderr, but there is no guarantee.
+
+
+II) The program "bill" works in the similar way as "calc" just using the GUI. To start you have to fill a configuration in above explained format then LOAD&VERIFY it. After that there are
+two TABS:
+
+  trajectory tab  <-- to calculate and display trajectory inside the billiard
+  poincare tab  <-- to calculate the phase-space portraits
+
+In them you set up the calculation with exactly same data as by using "calc" programs. The errors and all the messages are output to the "message window" on the button of the "main window". More sever problem that have not been considered by the author are output to stderr.
+
+
+Happy usage wishes you,
+
+Martin 
+
+
+
+
+
